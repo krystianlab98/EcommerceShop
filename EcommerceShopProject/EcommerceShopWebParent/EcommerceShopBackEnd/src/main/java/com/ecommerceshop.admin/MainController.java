@@ -8,6 +8,9 @@ public class MainController {
 
     @GetMapping("")
     public String viewHomePage(){
-        return "index";
+        return "indexasd";
     }
+
+    @GetMapping("/test")
+    public String test(){return "test";}
 }
