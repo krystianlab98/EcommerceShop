@@ -25,7 +25,7 @@ public class UserRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Test
-    public void createOneRoleUser(){
+    public void createOneRoleUserTest(){
         Role role = testEntityManager.find(Role.class, 3L);
         User user = new User("user@gmail.com", "password", "Firstname", "LastName");
         user.addRole(role);
@@ -35,7 +35,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void createTwoRoleUser(){
+    public void createTwoRoleUserTest(){
         Role role1 = testEntityManager.find(Role.class, 3L);
         Role role2 = testEntityManager.find(Role.class, 4L);
         User user = new User("user2@gmail.com", "password2", "Firstname2", "LastName2");
@@ -46,26 +46,26 @@ public class UserRepositoryTest {
         assertThat(savedUser.getId()).isGreaterThan(0);
     }
     @Test
-    public void listAllUsers(){
+    public void listAllUsersTest(){
         List<User> listUsers = userRepository.findAll();
         listUsers.forEach(user -> System.out.println(user));
     }
 
     @Test
-    public void getUserById(){
+    public void getUserByIdTest(){
         User user = userRepository.findById(1L).get();
         assertThat(user).isNotNull();
     }
 
     @Test
-    public void updateUserDetails(){
+    public void updateUserDetailsTest(){
         User user = userRepository.findById(1L).get();
         user.setEnabled(true);
         userRepository.save(user);
     }
 
     @Test
-    public void updateUserRoles(){
+    public void updateUserRolesTest(){
         User user = userRepository.findById(2l).get();
         Role role = testEntityManager.find(Role.class, 4L);
         Role newRole = testEntityManager.find(Role.class, 2L);
@@ -74,8 +74,15 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void testDeleteUser(){
+    public void deleteUserTest(){
         userRepository.deleteById(2L);
+    }
+
+    @Test
+    public void getUserByEmailTest(){
+        String email = "labajkoo@gmail.com";
+        User user = userRepository.getUserByEmail(email);
+        assertThat(user).isNotNull();
     }
 
 
