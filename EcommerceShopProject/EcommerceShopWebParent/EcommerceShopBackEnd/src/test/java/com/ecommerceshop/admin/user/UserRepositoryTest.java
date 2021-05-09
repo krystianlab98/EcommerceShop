@@ -64,6 +64,20 @@ public class UserRepositoryTest {
         userRepository.save(user);
     }
 
+    @Test
+    public void updateUserRoles(){
+        User user = userRepository.findById(2l).get();
+        Role role = testEntityManager.find(Role.class, 4L);
+        Role newRole = testEntityManager.find(Role.class, 2L);
+        user.getRoles().remove(role);
+        user.addRole(newRole);
+    }
+
+    @Test
+    public void testDeleteUser(){
+        userRepository.deleteById(2L);
+    }
+
 
 
 
