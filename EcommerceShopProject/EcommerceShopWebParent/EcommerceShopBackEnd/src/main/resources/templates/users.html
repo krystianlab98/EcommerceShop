@@ -6,6 +6,8 @@
     <title>Ecommerce Admin Control Panel</title>
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
     <script type = "text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type = "text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 
@@ -72,7 +74,7 @@
         <div>
             <table class="table table-bordered table-striped table-hover table-responsive-xl">
                 <thead class="thead-dark">
-                    <tr>
+                    <tr class="text-center">
                         <th>User ID</th>
                         <th>Photos</th>
                         <th>Email</th>
@@ -84,16 +86,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="user : ${listUsers}">
+                    <tr th:each="user : ${listUsers}" class="text-center">
                         <td>[[${user.id}]]</td>
-                        <td></td>
+                        <td><span class="far fa-user fa-3x icon-dark"></span></td>
                         <td>[[${user.email}]]</td>
                         <td>[[${user.firstName}]]</td>
                         <td>[[${user.lastName}]]</td>
                         <td>[[${user.roles}]]</td>
-                        <td>[[${user.enabled}]]</td>
+
                         <td>
-                            Edit &nbsp; Delete
+                            <span th:if="${user.enabled == true}" class="fas fa-user-check fa-2x icon-green"></span>
+                            <span th:if="${user.enabled == false}" class="fas fa-user-check fa-2x icon-red"></span>
+                        </td>
+                        <td>
+                            <a class="fas fa-user-edit fa-2x icon-green" href=""></a>
+                            &nbsp
+                            <a class="fas fa-trash-alt fa-2x icon-red" href=""></a>
                         </td>
                     </tr>
                 </tbody>
