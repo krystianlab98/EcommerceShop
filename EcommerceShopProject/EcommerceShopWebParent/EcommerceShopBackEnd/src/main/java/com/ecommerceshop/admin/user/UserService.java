@@ -1,6 +1,7 @@
 package com.ecommerceshop.admin.user;
 
 
+import com.ecommerceshop.admin.errors.UserNotFoundException;
 import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
@@ -33,12 +35,30 @@ public class UserService {
     public List<Role> getRoles(){
         return roleRepository.findAll();
     }
-    private void encodePassword(User user){
+    public void encodePassword(User user){
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
     }
-    public boolean isEmailUnique(String email){
+    public boolean isEmailUnique(Long id, String email){
         User user = userRepository.getUserByEmail(email);
-        return user == null;
+        if(user == null) return true;
+        boolean isNewUser = ( id == null);
+        if(isNewUser){
+            if(user != null) return false;
+        } else {
+            if(user.getId() != id){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public User get(Long id) throws UserNotFoundException {
+        try {
+            return userRepository.findById(id).get();
+        } catch (NoSuchElementException e){
+            throw new UserNotFoundException("Could not find any user with ID: " + id);
+        }
+
     }
 }
