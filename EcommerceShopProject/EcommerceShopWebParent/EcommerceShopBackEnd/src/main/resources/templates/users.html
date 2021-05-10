@@ -99,9 +99,10 @@
                             <span th:if="${user.enabled == false}" class="fas fa-user-check fa-2x icon-red"></span>
                         </td>
                         <td>
-                            <a class="fas fa-user-edit fa-2x icon-green" href=""></a>
-                            &nbsp
-                            <a class="fas fa-trash-alt fa-2x icon-red" href=""></a>
+                            <a class="fas fa-user-edit fa-2x icon-green" th:href="@{'/users/edit/' + ${user.id}}"
+                                title="Edit user"></a>
+                            &nbsp;&nbsp;
+                            <a class="fas fa-trash-alt fa-2x icon-red"th:href="@{'/users/delete/' + ${user.id}}"></a>
                         </td>
                     </tr>
                 </tbody>
