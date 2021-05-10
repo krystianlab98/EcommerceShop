@@ -86,14 +86,26 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void countByIdTest(){
+    public void countByIdTest() {
         Long id = 1L;
         Long countById = userRepository.countById(id);
 
         assertThat(countById).isNotNull().isGreaterThan(0);
     }
 
+    @Test
+    public void disableUserTest() {
+        Long id = 1L;
+        userRepository.updateEnableStatus(1L, false);
 
+    }
+
+    @Test
+    public void enableUserTest() {
+        Long id = 1L;
+        userRepository.updateEnableStatus(1L, true);
+
+    }
 
 
 }

@@ -7,11 +7,13 @@ import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@Transactional
 public class UserService {
 
     private UserRepository userRepository;
@@ -64,9 +66,14 @@ public class UserService {
     public void deleteById(Long id) throws UserNotFoundException {
         Long count = userRepository.countById(id);
 
-        if(count == null || count == 0){
-            throw new UserNotFoundException("Could not find any user with ID: " +id);
+        if (count == null || count == 0) {
+            throw new UserNotFoundException("Could not find any user with ID: " + id);
         }
         userRepository.deleteById(id);
     }
+
+    public void updateUserEnabledStatus(Long id, boolean enable) {
+        userRepository.updateEnableStatus(id, enable);
+    }
+
 }
