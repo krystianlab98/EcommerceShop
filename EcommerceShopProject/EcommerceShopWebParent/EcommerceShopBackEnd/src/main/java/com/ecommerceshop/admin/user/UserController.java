@@ -46,7 +46,7 @@ public class UserController {
         boolean isUserUpdating = (user.getId() != null);
 
         if(isUserUpdating){
-            User existingUser = userService.get(user.getId());
+            User existingUser = userService.getById(user.getId());
             if(user.getPassword().isEmpty()){
                 user.setPassword(existingUser.getPassword());
             } else {
@@ -65,7 +65,7 @@ public class UserController {
     public String editUser(@PathVariable Long id, RedirectAttributes redirectAttributes, Model model){
         try {
             List<Role> roles = userService.getRoles();
-            User user = userService.get(id);
+            User user = userService.getById(id);
 
             model.addAttribute("roles", roles);
             model.addAttribute("user", user);
@@ -80,5 +80,20 @@ public class UserController {
     }
 
 
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes, Model model){
 
-}
+        try {
+            userService.deleteById(id);
+            redirectAttributes.addFlashAttribute("message", "The user with ID: " +id + "has been deleted successfully");
+        } catch (UserNotFoundException e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("message", e.getMessage());
+        }
+        return "redirect:/users";
+
+    }
+
+
+
+    }

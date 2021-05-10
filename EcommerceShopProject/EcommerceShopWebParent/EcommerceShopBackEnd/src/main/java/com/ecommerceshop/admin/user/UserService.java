@@ -53,12 +53,20 @@ public class UserService {
         return true;
     }
 
-    public User get(Long id) throws UserNotFoundException {
+    public User getById(Long id) throws UserNotFoundException {
         try {
             return userRepository.findById(id).get();
         } catch (NoSuchElementException e){
             throw new UserNotFoundException("Could not find any user with ID: " + id);
         }
+    }
 
+    public void deleteById(Long id) throws UserNotFoundException {
+        Long count = userRepository.countById(id);
+
+        if(count == null || count == 0){
+            throw new UserNotFoundException("Could not find any user with ID: " +id);
+        }
+        userRepository.deleteById(id);
     }
 }
