@@ -5,6 +5,8 @@ import com.ecommerceshop.admin.errors.UserNotFoundException;
 import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +22,22 @@ public class UserService {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
+    public static final int USERS_PER_PAGE = 4;
+
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository,PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Page<User> listUsersByPage(int pageNumber) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, USERS_PER_PAGE);
+        return userRepository.findAll(pageRequest);
     }
 
     public User saveUser(User user) {

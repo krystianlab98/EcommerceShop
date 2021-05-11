@@ -5,6 +5,7 @@ import com.ecommerceshop.admin.utils.FIleUploadUtil;
 import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -29,13 +30,31 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public String getAllUsers(Model model){
-        List<User> users = userService.getAllUsers();
+    public String getAllUsers(Model model) {
+        return getAllUsers(1, model);
+    }
+
+    @GetMapping("/users/page/{number}")
+    public String getAllUsers(@PathVariable int number, Model model) {
+        Page<User> page = userService.listUsersByPage(number);
+        List<User> users = page.getContent();
+        long totalElements = page.getTotalElements();
+        long startCounter = (number - 1) * UserService.USERS_PER_PAGE + 1;
+        long endCounter = startCounter + UserService.USERS_PER_PAGE - 1;
+        if (endCounter > totalElements) {
+            endCounter = totalElements;
+        }
+        model.addAttribute("currentPage", number);
+        model.addAttribute("startCounter", startCounter);
+        model.addAttribute("endCounter", endCounter);
+        model.addAttribute("lastPage", page.getTotalPages());
+        model.addAttribute("totalElements", totalElements);
         model.addAttribute("listUsers", users);
         return "users";
     }
+
     @GetMapping("/users/create")
-    public String createNewUser(Model model){
+    public String createNewUser(Model model) {
         User user = new User();
         List<Role> roles = userService.getRoles();
         user.setEnabled(true);

@@ -67,7 +67,7 @@
             <h1>Manage Users</h1>
             <a th:href="@{/users/create}">Create new user</a>
         </div>
-        <div th:if="${message!=null}" class="alert alert-success text-center">
+        <div class="alert alert-success text-center" th:if="${ message != null}">
             [[${message}]]
         </div>
 
@@ -108,9 +108,10 @@
                         </td>
                         <td>
                             <a class="fas fa-user-edit fa-2x icon-green" th:href="@{'/users/edit/' + ${user.id}}"
-                                title="Edit user"></a>
+                               title="Edit user"></a>
                             &nbsp;&nbsp;
-                            <a class="fas fa-trash-alt fa-2x icon-red link-delete" th:href="@{'/users/delete/' + ${user.id}}"
+                            <a class="fas fa-trash-alt fa-2x icon-red link-delete"
+                               th:href="@{'/users/delete/' + ${user.id}}"
                                th:userId="${user.id}"
                                title="Delete user"></a>
                         </td>
@@ -118,6 +119,30 @@
                 </tbody>
             </table>
         </div>
+        <div class="text-center m-1" th:if="${totalElements > 0}">
+            <span> Showing users from [[${startCounter}]] to [[${endCounter}]] of [[${totalElements}]]</span>
+        </div>
+        <div class="text-center m-1" th:if="${totalElements < 0}">
+            <span>No users found </span>
+        </div>
+        <div class="justify-content-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" th:href="@{/users/page/1}" th:if="${currentPage > 1 }">First
+                        Page</a></li>
+                    <li class="page-item"><a class="page-link" th:href="@{'/users/page/' + ${currentPage - 1}}"
+                                             th:if="${currentPage > 1 }">Previous</a></li>
+                    <li th:class="${currentPage == i ? 'page-item active' : 'page-item'}"
+                        th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}">
+                        <a class="page-link" th:href="@{'/users/page/' + ${i}}" th:if="${i <= lastPage and i > 0}">[[${i}]]</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" th:href="@{'/users/page/' + ${currentPage+1}}"
+                                             th:if="${currentPage < lastPage }">Next</a></li>
+                    <a class="page-link" th:href="@{'/users/page/' + ${lastPage}}" th:if="${currentPage < lastPage }">Last</a></li>
+                </ul>
+            </nav>
+        </div>
+
         <div class="modal fade text-center" id="confirmModal">
             <div class="modal-dialog">
                 <div class="modal-content">
