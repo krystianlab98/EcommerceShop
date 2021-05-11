@@ -5,31 +5,54 @@ import com.ecommerceshop.admin.errors.UserNotFoundException;
 import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@Transactional
 public class UserService {
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
+    public static final int USERS_PER_PAGE = 4;
+
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository,PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-    public User saveUser(User user){
-        encodePassword(user);
+
+    public Page<User> listUsersByPage(int pageNumber) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, USERS_PER_PAGE);
+        return userRepository.findAll(pageRequest);
+    }
+
+    public User saveUser(User user) {
+        boolean isUserUpdating = (user.getId() != null);
+
+        if (isUserUpdating) {
+            User existingUser = userRepository.findById(user.getId()).get();
+            if (user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                encodePassword(user);
+            }
+        } else {
+            encodePassword(user);
+        }
         return userRepository.save(user);
     }
     public List<Role> getRoles(){
@@ -64,9 +87,14 @@ public class UserService {
     public void deleteById(Long id) throws UserNotFoundException {
         Long count = userRepository.countById(id);
 
-        if(count == null || count == 0){
-            throw new UserNotFoundException("Could not find any user with ID: " +id);
+        if (count == null || count == 0) {
+            throw new UserNotFoundException("Could not find any user with ID: " + id);
         }
         userRepository.deleteById(id);
     }
+
+    public void updateUserEnabledStatus(Long id, boolean enable) {
+        userRepository.updateEnableStatus(id, enable);
+    }
+
 }
