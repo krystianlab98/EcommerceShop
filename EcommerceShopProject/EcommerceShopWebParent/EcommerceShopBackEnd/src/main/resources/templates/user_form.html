@@ -64,20 +64,22 @@
         <div class="text-center">
             <h1>Edit Users | Create New User</h1>
         </div>
-        <form th:action="@{/users/save}" method="post" style="max-width: 900px; margin: 0 auto"
-              th:object="${user}"  onsubmit="return checkUniqueEmail(this);">
+        <form th:action="@{/users/save}" method="post" style="max-width: 900px; margin: 0 auto;"
+              th:object="${user}" onsubmit="return checkUniqueEmail(this);" enctype="multipart/form-data">
             <input type="hidden" th:field="*{id}">
-                <div class="border border-secondary rounded p-3">
-                    <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">E-mail</label>
-                        <div class="col-sm-8">
-                            <input type="email" class="form-control" th:field="*{email}" required minlength="8" maxlength="100"/>
-                        </div>
+            <div class=" border-secondary rounded p-3">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">E-mail</label>
+                    <div class="col-sm-8">
+                        <input type="email" class="form-control" th:field="*{email}" required minlength="8"
+                               maxlength="100"/>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">First Name</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" th:field="*{firstName}" required minlength="2" maxlength="64"/>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">First Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" th:field="*{firstName}" required minlength="2"
+                               maxlength="64"/>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -106,18 +108,29 @@
                            </th:block>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Enabled</label>
-                        <div class="col-sm-8">
-                            <input type="checkbox" th:field="*{enabled}" />
-                        </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Enabled</label>
+                    <div class="col-sm-8">
+                        <input type="checkbox" th:field="*{enabled}"/>
                     </div>
-                    <div class="text-center">
-                        <input type="submit" value="Save" class="btn btn-primary m-4"/>
-                        <input type="button" value="Cancel" class="btn btn-secondary" id="cancelButton"/>
-                    </div>
-
                 </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Photos</label>
+                    <div class="col-sm-8">
+                        <input type="hidden" th:field="*{photo}"/>
+                        <input type="file" id="fileImage" name="image" accept="image/png, image/jpeg"
+                               class="mb-2"/>
+                        <img id="photo" alt="photo preview" th:src="@{${user.getPhotosImagePath()}}"
+                             class="img-fluid" style="width: 100px"/>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="submit" value="Save" class="btn btn-primary m-4"/>
+                    <input type="button" value="Cancel" class="btn btn-secondary" id="cancelButton"/>
+                </div>
+
+            </div>
         </form>
 
         <div class="modal fade text-center" id="modalDialog">
@@ -139,27 +152,47 @@
             <p>Ecommerce Shop Control Panel - Copyright &copy; </p>
         </div>
     </div>
+
     <script type="text/javascript">
-        $(document).ready(function() {
-            $("#cancelButton").on("click", function(){
+        $(document).ready(function () {
+            $("#cancelButton").on("click", function () {
                 window.location = "[[@{/users}]]";
             });
+
+            $("#fileImage").change(function () {
+                fileSize = this.files[0].size;
+                if (fileSize > 4194304) {
+                    this.setCustomValidity("Image should be less than 4MB")
+                    this.reportValidity();
+                } else {
+                    showImage(this);
+                }
+            });
         });
-        function checkUniqueEmail(form){
+
+        function showImage(photo) {
+            let file = photo.files[0];
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $("#photo").attr("src", e.target.result);
+            };
+            reader.readAsDataURL(file)
+        }
+
+        function checkUniqueEmail(form) {
             url = "[[@{/users/check_email}]]";
             userEmail = $("#email").val();
             userId = $("#id").val();
             csrfValue = $("input[name='_csrf']").val();
             params = {id: userId, email: userEmail, _csrf: csrfValue};
 
-            $.post(url,params, function (response){
-                if(response == "Ok"){
+            $.post(url, params, function (response) {
+                if (response == "Ok") {
                     form.submit();
                 } else {
                     showModalDialog("Warning","This email exists: " + userEmail);
                 }
             });
-
             return false;
         }
         function showModalDialog(title, message){

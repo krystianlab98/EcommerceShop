@@ -30,8 +30,20 @@ public class UserService {
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
-    public User saveUser(User user){
-        encodePassword(user);
+
+    public User saveUser(User user) {
+        boolean isUserUpdating = (user.getId() != null);
+
+        if (isUserUpdating) {
+            User existingUser = userRepository.findById(user.getId()).get();
+            if (user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                encodePassword(user);
+            }
+        } else {
+            encodePassword(user);
+        }
         return userRepository.save(user);
     }
     public List<Role> getRoles(){
