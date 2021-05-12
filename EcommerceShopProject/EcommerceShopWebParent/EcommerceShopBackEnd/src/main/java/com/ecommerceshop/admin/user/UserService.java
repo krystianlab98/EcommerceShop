@@ -7,6 +7,7 @@ import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +36,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Page<User> listUsersByPage(int pageNumber) {
-        PageRequest pageRequest = PageRequest.of(pageNumber - 1, USERS_PER_PAGE);
+    public Page<User> listUsersByPage(int pageNumber, String sortField, String sortDirection) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDirection.equals("asc") ? sort.ascending() : sort.descending();
+
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, USERS_PER_PAGE, sort);
         return userRepository.findAll(pageRequest);
     }
 

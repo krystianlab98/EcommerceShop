@@ -6,6 +6,7 @@ import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -31,12 +32,13 @@ public class UserController {
 
     @GetMapping("/users")
     public String getAllUsers(Model model) {
-        return getAllUsers(1, model);
+        return getAllUsers(1, "id", "asc", model);
     }
 
     @GetMapping("/users/page/{number}")
-    public String getAllUsers(@PathVariable int number, Model model) {
-        Page<User> page = userService.listUsersByPage(number);
+    public String getAllUsers(@PathVariable int number, @Param("sortField") String sortField,
+                              @Param("sortDirection") String sortDirection, Model model) {
+        Page<User> page = userService.listUsersByPage(number, sortField, sortDirection);
         List<User> users = page.getContent();
         long totalElements = page.getTotalElements();
         long startCounter = (number - 1) * UserService.USERS_PER_PAGE + 1;
@@ -49,7 +51,13 @@ public class UserController {
         model.addAttribute("endCounter", endCounter);
         model.addAttribute("lastPage", page.getTotalPages());
         model.addAttribute("totalElements", totalElements);
+
         model.addAttribute("listUsers", users);
+
+        String reverseDirection = sortDirection.equals("asc") ? "desc" : "asc";
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("reverseDirection", reverseDirection);
         return "users";
     }
 
