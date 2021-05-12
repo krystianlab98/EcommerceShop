@@ -32,13 +32,15 @@ public class UserController {
 
     @GetMapping("/users")
     public String getAllUsers(Model model) {
-        return getAllUsers(1, "id", "asc", model);
+        return getAllUsers(1, "id", "asc", null, model);
     }
 
     @GetMapping("/users/page/{number}")
-    public String getAllUsers(@PathVariable int number, @Param("sortField") String sortField,
-                              @Param("sortDirection") String sortDirection, Model model) {
-        Page<User> page = userService.listUsersByPage(number, sortField, sortDirection);
+    public String getAllUsers(@PathVariable int number,
+                              @Param("sortField") String sortField,
+                              @Param("sortDirection") String sortDirection,
+                              @Param("key") String key, Model model) {
+        Page<User> page = userService.listUsersByPage(number, sortField, sortDirection, key);
         List<User> users = page.getContent();
         long totalElements = page.getTotalElements();
         long startCounter = (number - 1) * UserService.USERS_PER_PAGE + 1;
@@ -49,7 +51,7 @@ public class UserController {
         model.addAttribute("currentPage", number);
         model.addAttribute("startCounter", startCounter);
         model.addAttribute("endCounter", endCounter);
-        model.addAttribute("lastPage", page.getTotalPages());
+        model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalElements", totalElements);
 
         model.addAttribute("listUsers", users);
@@ -58,6 +60,8 @@ public class UserController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseDirection", reverseDirection);
+
+        model.addAttribute("key", key);
         return "users";
     }
 
