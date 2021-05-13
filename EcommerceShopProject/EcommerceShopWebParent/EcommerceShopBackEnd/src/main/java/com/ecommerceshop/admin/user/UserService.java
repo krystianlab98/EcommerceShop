@@ -7,6 +7,8 @@ import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +37,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Page<User> listUsersByPage(int pageNumber) {
-        PageRequest pageRequest = PageRequest.of(pageNumber - 1, USERS_PER_PAGE);
-        return userRepository.findAll(pageRequest);
+    public Page<User> listUsersByPage(int pageNumber, String sortField, String sortDirection, String key) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDirection.equals("asc") ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, USERS_PER_PAGE, sort);
+
+        if (key != null) {
+            return userRepository.findAll(key, pageable);
+        }
+        return userRepository.findAll(pageable);
     }
 
     public User saveUser(User user) {
@@ -63,7 +72,7 @@ public class UserService {
         user.setPassword(encodedPassword);
     }
     public boolean isEmailUnique(Long id, String email){
-        User user = userRepository.getUserByEmail(email);
+        User user = userRepository.findUserByEmail(email);
         if(user == null) return true;
         boolean isNewUser = ( id == null);
         if(isNewUser){

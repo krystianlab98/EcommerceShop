@@ -70,40 +70,56 @@
         <div class="alert alert-success text-center" th:if="${ message != null}">
             [[${message}]]
         </div>
-
         <div>
+            <form th:action="@{/users/page/1}" class="form-inline m-3">
+                <input type="hidden" name="sortField" th:value="${sortField}">
+                <input type="hidden" name="sortDirection" th:value="${sortDirection}">
+                Search:
+                <input type="search" name="key" th:value="${key}" class="form-control">
+                &nbsp;&nbsp;
+                <input type="submit" value="Search" class="btn btn-primary">
+                &nbsp;&nbsp;
+                <input type="button" value="Clear" class="btn btn-secondary" onclick="clearSearch()">
+            </form>
+        </div>
+
+        <div class="full-details">
             <table class="table table-bordered table-striped table-hover table-responsive-xl">
                 <thead class="thead-dark">
-                    <tr class="text-center">
-                        <th>User ID</th>
-                        <th>Photos</th>
-                        <th>Email</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Roles</th>
-                        <th>Enabled</th>
-                        <th></th>
-                    </tr>
+                <tr class="text-center">
+                    <th class="hideable-column">
+                    <th th:replace="fragments :: column_link('id', 'USER ID', 'tag')"/>
+                    </th>
+                    <th>Photos</th>
+                    <th class="hideable-column">
+                    <th th:replace="fragments :: column_link('email', 'Email', 'tag')"/>
+                    </th>
+                    <th th:replace="fragments :: column_link('firstName', 'First Name', 'none')"/>
+                    <th th:replace="fragments :: column_link('lastName', 'Last Name','none')"/>
+                    <th>Roles</th>
+                    <th th:replace="fragments :: column_link('enabled', 'Enabled','none')"/>
+                    <th></th>
+                </tr>
                 </thead>
                 <tbody>
                     <tr th:each="user : ${listUsers}" class="text-center">
-                        <td>[[${user.id}]]</td>
+                        <td class="hideable-column">[[${user.id}]]</td>
                         <td>
                             <span th:if="${user.photo == null}" class="far fa-user fa-4x icon-dark"></span>
                             <img th:if="${user.photo != null}" th:src="@{${user.getPhotosImagePath()}}"
                                  style="width: 100px">
                         </td>
-                        <td>[[${user.email}]]</td>
+                        <td class="hideable-column">[[${user.email}]]</td>
                         <td>[[${user.firstName}]]</td>
                         <td>[[${user.lastName}]]</td>
                         <td>[[${user.roles}]]</td>
 
                         <td>
                             <a th:if="${user.enabled == true}" class="fas fa-user-check fa-2x icon-green"
-                               th:href="@{'users/' + ${user.id} + '/enabled/false'}"
+                               th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
                                title="Disable user"></a>
                             <a th:if="${user.enabled == false}" class="fas fa-user-check fa-2x icon-red"
-                               th:href="@{'users/' + ${user.id} + '/enabled/true'}"
+                               th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
                                title="Enable user"></a>
                         </td>
                         <td>
@@ -119,26 +135,63 @@
                 </tbody>
             </table>
         </div>
+        <div class="less-details">
+            <div th:each="user : ${listUsers}" class="row m-2">
+                <div class="col-4">
+                    <span th:if="${user.photo == null}" class="far fa-user fa-4x icon-dark"></span>
+                    <img th:if="${user.photo != null}" th:src="@{${user.getPhotosImagePath()}}"
+                         style="width: 100px">
+                </div>
+                <div class="col-8">
+                    <div>
+                        [[${user.fullName}]]
+                    </div>
+                    <div>
+                        [[${user.roles}]]
+                    </div>
+                    <div class="mt-2">
+                        <a th:if="${user.enabled == true}" class="fas fa-user-check fa-2x icon-green"
+                           th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
+                           title="Disable user"></a>
+                        <a th:if="${user.enabled == false}" class="fas fa-user-check fa-2x icon-red"
+                           th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
+                           title="Enable user"></a>
+                        &nbsp;
+                        <a class="fas fa-user-edit fa-2x icon-green" th:href="@{'/users/edit/' + ${user.id}}"
+                           title="Edit user"></a>
+                        &nbsp;&nbsp;&nbsp;
+                        <a class="fas fa-trash-alt fa-2x icon-red link-delete"
+                           th:href="@{'/users/delete/' + ${user.id}}"
+                           th:userId="${user.id}"
+                           title="Delete user"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="text-center m-1" th:if="${totalElements > 0}">
             <span> Showing users from [[${startCounter}]] to [[${endCounter}]] of [[${totalElements}]]</span>
         </div>
         <div class="text-center m-1" th:if="${totalElements < 0}">
             <span>No users found </span>
         </div>
-        <div class="justify-content-center">
+        <div th:if="${totalPages > 0}">
             <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" th:href="@{/users/page/1}" th:if="${currentPage > 1 }">First
-                        Page</a></li>
-                    <li class="page-item"><a class="page-link" th:href="@{'/users/page/' + ${currentPage - 1}}"
-                                             th:if="${currentPage > 1 }">Previous</a></li>
+                <ul class="pagination justify-content-center flex-wrap">
+                    <li class="page-item" th:if="${currentPage > 1 }">
+                        <a th:replace="fragments :: page_link(1, 'First Page')"></a>
+                    <li class="page-item" th:if="${currentPage > 1 }">
+                        <a th:replace="fragments :: page_link(${currentPage - 1}, 'Previous')"></a>
                     <li th:class="${currentPage == i ? 'page-item active' : 'page-item'}"
-                        th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}">
-                        <a class="page-link" th:href="@{'/users/page/' + ${i}}" th:if="${i <= lastPage and i > 0}">[[${i}]]</a>
+                        th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                        th:if="${i <= totalPages and i > 0}">
+                        <a th:replace="fragments :: page_link(${i}, ${i})"></a>
                     </li>
-                    <li class="page-item"><a class="page-link" th:href="@{'/users/page/' + ${currentPage+1}}"
-                                             th:if="${currentPage < lastPage }">Next</a></li>
-                    <a class="page-link" th:href="@{'/users/page/' + ${lastPage}}" th:if="${currentPage < lastPage }">Last</a></li>
+                    <li class="page-item" th:if="${currentPage < totalPages }">
+                        <a th:replace="fragments :: page_link(${currentPage+1}, 'Next')"></a>
+                    </li>
+                    <li class="page-item" th:if="${currentPage < totalPages }">
+                        <a th:replace="fragments :: page_link(${totalPages}, 'Last')"></a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -166,17 +219,20 @@
         </div>
     </div>
 <script type="text/javascript">
-    $(document).ready(function (){
-        $(".link-delete").on("click", function(e) {
+    $(document).ready(function () {
+        $(".link-delete").on("click", function (e) {
             e.preventDefault();
             link = $(this);
-            userId=link.attr("userId");
+            userId = link.attr("userId");
             $("#yesButton").attr("href", link.attr("href"));
             $("#confirmText").text("Do you want delete User ?" + userId);
             $("#confirmModal").modal();
         });
     });
 
+    function clearSearch() {
+        window.location = "[[@{/users}]]";
+    }
 </script>
 </body>
 </html>
