@@ -6,6 +6,7 @@ import com.ecommerceshop.common.entity.Role;
 import com.ecommerceshop.common.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -31,12 +32,15 @@ public class UserController {
 
     @GetMapping("/users")
     public String getAllUsers(Model model) {
-        return getAllUsers(1, model);
+        return getAllUsers(1, "id", "asc", null, model);
     }
 
     @GetMapping("/users/page/{number}")
-    public String getAllUsers(@PathVariable int number, Model model) {
-        Page<User> page = userService.listUsersByPage(number);
+    public String getAllUsers(@PathVariable int number,
+                              @Param("sortField") String sortField,
+                              @Param("sortDirection") String sortDirection,
+                              @Param("key") String key, Model model) {
+        Page<User> page = userService.listUsersByPage(number, sortField, sortDirection, key);
         List<User> users = page.getContent();
         long totalElements = page.getTotalElements();
         long startCounter = (number - 1) * UserService.USERS_PER_PAGE + 1;
@@ -47,9 +51,17 @@ public class UserController {
         model.addAttribute("currentPage", number);
         model.addAttribute("startCounter", startCounter);
         model.addAttribute("endCounter", endCounter);
-        model.addAttribute("lastPage", page.getTotalPages());
+        model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalElements", totalElements);
+
         model.addAttribute("listUsers", users);
+
+        String reverseDirection = sortDirection.equals("asc") ? "desc" : "asc";
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("reverseDirection", reverseDirection);
+
+        model.addAttribute("key", key);
         return "users";
     }
 
@@ -65,7 +77,7 @@ public class UserController {
     }
 
     @PostMapping("/users/save")
-    public String saveNewUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile file) throws UserNotFoundException, IOException {
+    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile file) throws UserNotFoundException, IOException {
 
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -78,11 +90,11 @@ public class UserController {
         } else {
             if (user.getPhoto().isEmpty()) {
                 user.setPhoto(null);
-                userService.saveUser(user);
             }
+            userService.saveUser(user);
         }
         redirectAttributes.addFlashAttribute("message", "User has been saved successfully");
-        return "redirect:/users";
+        return "redirect:/users/page/1?sortField=id&sortDirection=asc&key=" + user.getEmail();
     }
 
     @GetMapping("/users/edit/{id}")
