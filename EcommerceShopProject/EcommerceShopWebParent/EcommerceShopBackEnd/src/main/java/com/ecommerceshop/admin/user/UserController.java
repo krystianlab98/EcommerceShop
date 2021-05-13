@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @PostMapping("/users/save")
-    public String saveNewUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile file) throws UserNotFoundException, IOException {
+    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile file) throws UserNotFoundException, IOException {
 
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -90,11 +90,11 @@ public class UserController {
         } else {
             if (user.getPhoto().isEmpty()) {
                 user.setPhoto(null);
-                userService.saveUser(user);
             }
+            userService.saveUser(user);
         }
         redirectAttributes.addFlashAttribute("message", "User has been saved successfully");
-        return "redirect:/users";
+        return "redirect:/users/page/1?sortField=id&sortDirection=asc&key=" + user.getEmail();
     }
 
     @GetMapping("/users/edit/{id}")
