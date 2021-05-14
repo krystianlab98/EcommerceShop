@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -31,6 +32,10 @@ public class UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.findUserByEmail(email);
     }
 
     public List<User> getAllUsers() {
@@ -64,16 +69,34 @@ public class UserService {
         }
         return userRepository.save(user);
     }
-    public List<Role> getRoles(){
+
+    public User updateAccount(User updatedUser) {
+        User dbUser = userRepository.findById(updatedUser.getId()).get();
+        if (!updatedUser.getPassword().isEmpty()) {
+            dbUser.setPassword(updatedUser.getPassword());
+            encodePassword(dbUser);
+        }
+        if (updatedUser.getPhoto() != null) {
+            dbUser.setPhoto(updatedUser.getPhoto());
+        }
+        dbUser.setFirstName(updatedUser.getFirstName());
+        dbUser.setLastName(updatedUser.getLastName());
+
+        return userRepository.save(dbUser);
+    }
+
+    public List<Role> getRoles() {
         return roleRepository.findAll();
     }
-    public void encodePassword(User user){
+
+    public void encodePassword(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
     }
-    public boolean isEmailUnique(Long id, String email){
+
+    public boolean isEmailUnique(Long id, String email) {
         User user = userRepository.findUserByEmail(email);
-        if(user == null) return true;
+        if (user == null) return true;
         boolean isNewUser = ( id == null);
         if(isNewUser){
             if(user != null) return false;
