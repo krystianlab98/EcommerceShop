@@ -32,13 +32,14 @@
                 <input type="password" name="password" class="form-control" placeholder="password" required>
             </p>
             <p>
+                <input type="checkbox" name="remember-me"/>&nbsp;Remember me
+            </p>
+            <p>
                 <input type="submit" value="Login" class="btn btn-primary"/>
             </p>
         </div>
     </form>
-    <div>
-        <p>Ecommerce Shop Control Panel - Copyright &copy; </p>
-    </div>
+    <div th:replace="fragments :: footer"></div>
 </div>
 </body>
 </html>

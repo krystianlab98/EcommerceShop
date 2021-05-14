@@ -1,67 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-    <title>Ecommerce Admin Control Panel</title>
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
-    <link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
-    <script type = "text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
-    <script type = "text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<head th:replace="fragments :: page_head('Users list - admin panel')">
 
 </head>
 <body>
     <div class="container-fluid">
-        <div>
-            <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-                <a class="navbar-brand" th:href="@{/}">
-                    <img th:src="@{/images/smallLogo.png}"/>
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topNavbar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span  class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="topNavbar">
-                    <ul class="navbar-nav">
+        <div th:replace="navigation :: menu">
 
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/categories}">Categories</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/brands}">Brands</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/products}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/articles}">Articles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/users}">Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/customers}">Customers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/orders}">Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/shipping}">Shipping</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/salesreports}">Sales Reports</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/menus}">Menu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/settings}">Settings</a>
-                        </li>
-
-                    </ul>
-                </div>
-            </nav>
         </div>
         <div class="text-center">
             <h1>Manage Users</h1>
@@ -214,9 +159,7 @@
                 </div>
             </div>
         </div>
-        <div class="text-center">
-            <p>Ecommerce Shop Control Panel - Copyright &copy; </p>
-        </div>
+        <div th:replace="fragments :: footer"></div>
     </div>
 <script type="text/javascript">
     $(document).ready(function () {
