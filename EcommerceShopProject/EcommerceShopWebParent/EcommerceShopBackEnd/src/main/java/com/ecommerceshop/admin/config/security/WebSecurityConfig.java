@@ -49,7 +49,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("email")
                 .permitAll()
                 .defaultSuccessUrl("/", true)
-                .and().logout().permitAll();
+                .and().logout().permitAll()
+                .and().rememberMe().key("uniqueAndSecret");
     }
 
     @Override
